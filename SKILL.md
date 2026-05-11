@@ -25,6 +25,20 @@ Render technical documents into polished single-file HTML, with two themes (`edi
 
 ## Workflow
 
+### Step 0 — If the user is asking to modify an existing HTML, repair Save-As corruption first
+
+Before any other work, check whether the input is an existing rendered `.html` (rather than a fresh `.md`). If so, scan the first 5 lines and the TOC `<a href="...">` attributes for two markers:
+
+1. An HTML comment of the form `<!-- saved from url=(NNNN)file:///...html -->` near the top
+2. TOC `href` values that start with `file:///` instead of `#`
+
+If either is present, the file has been through Chrome's "Save Page As" cycle. Normalize before any other edit, in one shot:
+
+- Strip the `saved from url=` comment (it's only a Chrome breadcrumb)
+- Replace the absolute `file:///full/path-to-original.html#x` prefix on every TOC href with `#` — the same prefix repeats across all TOC links, so a single replace-all works
+
+Tell the user you did this repair pass, then proceed to their actual request (add a section, change content, re-render). Skip this step entirely if the input is a `.md` source — there's nothing to repair.
+
 ### Step 1 — Classify and pick theme
 
 Look at the source MD's headings, structure, and content. Classify as one of:
@@ -107,7 +121,11 @@ Theme-specific anti-slop rules are in each theme's reference file.
 
 ### Step 7 — Write and present
 
-Write to `/mnt/user-data/outputs/<doc-name>.html` (or working directory). Name from source filename. Present the file. Tell the user:
+**Output path.** Write next to the source MD by default — `foo.md` → `foo.html` in the same directory. Don't ask the user to pick a location; pick the obvious one and state it in the report. Sandbox-only fallback: if you're running in a Claude.ai web environment with no writable working dir, write to `/mnt/user-data/outputs/<doc-name>.html`. **Don't use `/mnt/user-data/outputs/` on local Claude Code** — that path doesn't exist and writes will fail or land in an arbitrary fallback.
+
+**Updating an existing HTML.** Always regenerate by re-running this skill against the (possibly updated) source MD, overwriting the same `.html` path in place. **Never tell the user to use Chrome's "Save Page As"** to relocate or update the rendered file — that command rewrites every `#anchor` href into absolute `file:///full/path.html#anchor` form, which kills both TOC scroll-spy (the JS `querySelector('#anchor')` lookup fails) and click navigation (the browser tries to navigate to a different file that may not exist). If a downstream `.html` shows up with a `<!-- saved from url= -->` comment near the top, it's been through Save-As — go through Step 0 first to normalize it.
+
+**Then tell the user:**
 
 - Which theme you picked and why
 - What re-organization choices you made (e.g. "I promoted the metrics section to the top, tabbed the architecture views")
