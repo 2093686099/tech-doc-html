@@ -2,6 +2,8 @@
 
 A Claude skill that turns agent output into single-file HTML reports — for plans you'll actually re-open, PRDs your team will actually read, and reviews that survive Monday morning.
 
+<img src="assets/screenshots/hero.png" width="800" alt="Postgres migration plan rendered as a dashboard — status tiles, phase timeline, and a migration flow SVG with a dashed rollback branch">
+
 ## The problem
 
 [Thariq Shihipar](https://x.com/trq212/status/2052811606032269638), an Anthropic engineer on Claude Code, made the case last month: HTML is the new Markdown for agent output. The argument is hard to dismiss.
@@ -93,8 +95,13 @@ Use `references/` as a system-prompt asset. The directory is structured so each 
 
 Two generic examples in `examples/`:
 
-- **`example-prd.md` → `example-prd.html`** — PRD for adding dark mode to a hypothetical open-source editor (editorial theme)
-- **`example-plan.md` → `example-plan.html`** — Postgres 13 → 16 migration execution plan (dashboard theme)
+**`example-prd.md` → `example-prd.html`** — PRD for adding dark mode to a hypothetical open-source editor (editorial theme)
+
+<img src="assets/screenshots/example-prd.png" width="800" alt="PRD rendered with editorial theme — problem statement, critical decision callout, SVG token comparison, collapsible decisions, risks, and out-of-scope">
+
+**`example-plan.md` → `example-plan.html`** — Postgres 13 → 16 migration execution plan (dashboard theme)
+
+<img src="assets/screenshots/example-plan.png" width="800" alt="Execution plan rendered with dashboard theme — status tiles, phase timeline, SVG migration flow with rollback branch, task table, milestones, and risks">
 
 Open the `.html` files in a browser. The `.md` files are the inputs Claude was given.
 
