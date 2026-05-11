@@ -1,17 +1,17 @@
 ---
 name: tech-doc-html
-description: Render Markdown technical documents (PRD, execution/implementation plan, system architecture, RFC/ADR, design doc, postmortem, roadmap, research report, spec) into polished, human-readable single-file HTML. Use this skill whenever the user has a `.md` file (or several) of any of these types and wants an HTML version for sharing with team or leadership, reviewing, or tracking ongoing work — even if they just say "make this look nice", "render as html", "把这份 md 做成 html", "convert this PRD to a webpage", or similar. ALSO trigger when the user wants to track AI-assisted work progress visually (rendering an execution plan that they update as work proceeds) — this is a primary use case, not a side feature. The skill picks one of two themes (`editorial` for narrative-heavy docs, `dashboard` for status/tracking docs) based on the document type. Output is always a single self-contained `.html` file. Enforces an anti-AI-slop floor (no purple gradients, no emoji-as-icons, no Inter as body font) but allows distinct theme aesthetics within that. The skill judges when to add light interactivity (filtering, collapsing, view switching) based on document size and type.
+description: Render technical documents (PRD, ADR/RFC, execution plan, system architecture, design doc, postmortem, roadmap, research report, spec) into polished single-file HTML — from a `.md` source, or directly without one. Trigger when the user wants HTML for any of these doc types, including phrasings like "render as html", "把这份 md 做成 html", or tracking AI-assisted work progress visually.
 ---
 
 # tech-doc-html
 
-Render Markdown technical documents into polished single-file HTML, with two themes (`editorial` and `dashboard`) and context-aware interactivity. Source of truth stays in MD; HTML is the presentation artifact, regenerated on demand.
+Render technical documents into polished single-file HTML, with two themes (`editorial` and `dashboard`) and context-aware interactivity. When a source `.md` exists, it stays the source of truth and the HTML is regenerated on demand; when no source exists, the HTML is produced directly under the same constraints.
 
 ## Core principles
 
 1. **Reshape, don't reskin.** HTML's value is in re-organizing for scanning and navigation, not in prettier fonts. If the HTML output reads sequentially top-to-bottom just like the MD did, this skill failed. Promote key info to the top, group parallel content side-by-side, separate "summary" from "detail", let readers jump.
 
-2. **MD is source of truth; the HTML carries no persistent state.** Never modify the source `.md`. The HTML is regenerated from MD. When status changes, the user updates MD and re-renders. Reader-side ephemeral state (filter selections, expanded collapsibles, current tab) is fine because it lives until reload; **persistent state via `localStorage` / cookies is banned** — it competes with MD for authority and grows into "who marked what" semantics that don't belong in a static snapshot. Details in `references/interactivity.md`. This is especially important for execution plans (see "Tracking artifact" below).
+2. **MD is source of truth; the HTML carries no persistent state.** Never modify the source `.md`. The HTML is regenerated from MD. When status changes, the user updates MD and re-renders. **When asked to produce HTML directly without a source `.md`**, the same skill rules apply, just without the regeneration loop. Reader-side ephemeral state (filter selections, expanded collapsibles, current tab) is fine because it lives until reload; **persistent state via `localStorage` / cookies is banned** — it competes with content authority and grows into "who marked what" semantics that don't belong in a static snapshot. Details in `references/interactivity.md`. This is especially important for execution plans (see "Tracking artifact" below).
 
 3. **Single self-contained file.** All CSS inline. JS inline (vanilla, no frameworks). External CDN only for Mermaid (and Chart.js if data viz is needed, which is rare — see `references/data-viz.md`). Output opens directly in any browser, attaches to email, shares as a link.
 
